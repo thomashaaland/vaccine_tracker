@@ -11,6 +11,13 @@ nor_geo = f"{url}/norway.json"
 #data = pd.read_csv(nor_geo)
 #print(data.head())
 
+# Vaccine info from FHI
+url_FHI = "https://www.fhi.no/api/chartdata/api/"
+data_url = f"{url_FHI}99112"
+
+data = pd.read_csv(data_url)
+print(data.head())
+
 # Create the map
 center_lat = 65
 center_long = 18
