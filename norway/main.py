@@ -2,6 +2,8 @@ import pandas as pd
 import folium
 import matplotlib.pyplot as plt
 import seaborn as sns
+import requests
+#from urllib.request import Request, urlopen
 
 # URL for norway map
 url = (
@@ -12,10 +14,14 @@ nor_geo = f"{url}/norway.json"
 #print(data.head())
 
 # Vaccine info from FHI
-url_FHI = "https://www.fhi.no/api/chartdata/api/"
-data_url = f"{url_FHI}99112"
+url_FHI = "https://www.fhi.no/api/chartdata/api"
+data_url = f"{url_FHI}/99112"
+req = requests.get(data_url, allow_redirects = True)
+print(data_url)
 
-data = pd.read_csv(data_url)
+#page = urlopen(req).read()
+print(str(req.content, 'utf-8'))
+data = pd.DataFrame(str(req.content, 'utf-8'))
 print(data.head())
 
 # Create the map
