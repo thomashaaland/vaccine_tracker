@@ -9,7 +9,7 @@ import geopy
 from geopandas.tools import geocode
 import geopandas
 import os
-
+import glob
 
 # Geopy init
 geopy.geocoders.options.default_user_agent = __name__
@@ -41,13 +41,17 @@ url = (
 nor_geo = f"{url}/norway.json"
 
 # Load county borders
-json_counties_list = list(os.walk(path_fylke))[0][2]
-#print(json_counties_list)
-json_counties = pd.DataFrame([])
-json_counties = pd.concat([
-    geopandas.read_file(f"{path_fylke}/{fylke}") for fylke in json_counties_list[:-1]
-    ])
-print(json_counties.navn)
+json_counties_list = [name for name in glob.glob(f"{path_fylke}/*")] #list(os.walk(path_fylke))
+[print(f) for f in json_counties_list]
+
+#json_counties = pd.concat([
+#    geopandas.read_file(fylke) for fylke in json_counties_list[3:4]
+#])
+
+k = 3
+json_counties = geopandas.read_file(json_counties_list[k])
+print(json_counties_list[k])
+print(json_counties.columns)
 exit()
 
 # Vaccine info from FHI
