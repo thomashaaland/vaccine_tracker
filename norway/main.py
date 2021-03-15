@@ -10,19 +10,18 @@ url = (
     "https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/"
 )
 nor_geo = f"{url}/norway.json"
-#data = pd.read_csv(nor_geo)
-#print(data.head())
 
 # Vaccine info from FHI
+# Numbers by county
 url_FHI = "https://www.fhi.no/api/chartdata/api"
 data_url = f"{url_FHI}/99112"
 req = requests.get(data_url, allow_redirects = True)
-print(data_url)
+data_list = eval(str(req.content, 'utf-8'))
+cols = data_list[0]
 
-#page = urlopen(req).read()
-print(str(req.content, 'utf-8'))
-data = pd.DataFrame(str(req.content, 'utf-8'))
-print(data.head())
+data = pd.DataFrame(data_list[1:], columns = cols)
+data.index = data.iloc[:,0]
+data = data.drop(["Fylke"], axis = 1)
 
 # Create the map
 center_lat = 65
