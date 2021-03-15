@@ -1,9 +1,16 @@
 import pandas as pd
 import folium
+from folium import Marker
+from folium.plugins import HeatMap
 import matplotlib.pyplot as plt
 import seaborn as sns
 import requests
+import geopy
 from geopandas.tools import geocode
+
+
+# Geopy init
+geopy.geocoders.options.default_user_agent = __name__
 
 # Define functions
 def url_list_2_df(url):
@@ -12,10 +19,15 @@ def url_list_2_df(url):
     cols = data_list[0]
     
     data = pd.DataFrame(data_list[1:], columns = cols)
-    data.index = data.iloc[:,0]
-    data = data.drop(cols[0], axis = 1)
     return data
-    
+
+def geocoder(row):
+    try:
+        point = geocode(row, provider = 'nominatim').geometry.iloc[0]
+        return pd.Series({"Latitude": point.y, "Longitude": point.x, "geometry": point})
+    except:
+        return None
+
 # URL for norway map
 url = (
     "https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/"
@@ -28,7 +40,9 @@ url_FHI = "https://www.fhi.no/api/chartdata/api"
 # Numbers by county
 data_counties_url = f"{url_FHI}/99112"
 data_counties = url_list_2_df(data_counties_url)
-#print(data_counties)
+
+data_counties[["Latitude", "Longitude", "geometry"]] = data_counties.apply(lambda x: geocoder(x.Fylke), axis = 1)
+#print(data_counties.head())
 
 # Numbers by communes
 # Need to decode kommunenr
@@ -42,6 +56,8 @@ center_long = 18
 map_w = folium.Map(location=[center_lat, center_long], tiles = 'Stamen Terrain')
 folium.FitBounds([(center_lat-5, center_long-5), (center_lat+5, center_long+5)]).add_to(map_w)
 
-
+# Add count to map
+for idx, row in data_counties.iterrows():
+    Marker([row["Latitude"], row["Longitude"]], popup=row.Fylke).add_to(map_w)
 
 map_w.save("test.html")
