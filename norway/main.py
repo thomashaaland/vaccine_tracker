@@ -7,10 +7,16 @@ import seaborn as sns
 import requests
 import geopy
 from geopandas.tools import geocode
+import geopandas
+import os
 
 
 # Geopy init
 geopy.geocoders.options.default_user_agent = __name__
+
+# Get path to geojson data
+cwd = os.getcwd()
+path_fylke = f"{cwd}/Fylke"
 
 # Define functions
 def url_list_2_df(url):
@@ -33,6 +39,16 @@ url = (
     "https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/"
 )
 nor_geo = f"{url}/norway.json"
+
+# Load county borders
+json_counties_list = list(os.walk(path_fylke))[0][2]
+#print(json_counties_list)
+json_counties = pd.DataFrame([])
+json_counties = pd.concat([
+    geopandas.read_file(f"{path_fylke}/{fylke}") for fylke in json_counties_list[:-1]
+    ])
+print(json_counties.navn)
+exit()
 
 # Vaccine info from FHI
 url_FHI = "https://www.fhi.no/api/chartdata/api"
